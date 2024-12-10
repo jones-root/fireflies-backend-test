@@ -8,5 +8,5 @@ db.createUser({
 });
 
 console.log(
-  `User ${process.env.MONGO_INITDB_ROOT_USERNAME} configured for ${process.env.MONGO_INITDB_DATABASE} database`
+  `User ${process.env.MONGO_INITDB_ROOT_USERNAME} configured for ${process.env.MONGO_INITDB_DATABASE} database`,
 );

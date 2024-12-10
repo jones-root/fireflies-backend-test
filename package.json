@@ -11,7 +11,8 @@
     "start:dev": "tsx watch src/server.ts",
     "start:docker": "docker-compose up",
     "build": "tsc --project tsconfig.build.json",
-    "seed": "tsx src/seed.ts"
+    "seed": "tsx src/seed.ts",
+    "format": "prettier --write ."
   },
   "keywords": [],
   "author": "",
@@ -29,6 +30,7 @@
     "@types/jsonwebtoken": "^9.0.7",
     "@types/mongoose": "^5.11.97",
     "@types/node": "^22.7.5",
+    "prettier": "^3.4.2",
     "tsx": "^4.19.1",
     "typescript": "^5.6.3"
   }
