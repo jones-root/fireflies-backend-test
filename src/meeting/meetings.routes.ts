@@ -11,7 +11,7 @@ export const router = express.Router();
 
 // GET all meetings for user
 router.get("/", async (req: AuthenticatedRequest, res) => {
-  const meetings = await Meeting.find({}, { __v: 0 });
+  const meetings = await Meeting.find({ userId: req.userId }, { __v: 0 });
 
   res.json({
     total: meetings.length,
@@ -21,6 +21,7 @@ router.get("/", async (req: AuthenticatedRequest, res) => {
   });
 });
 
+// POST create a meeting
 router.post(
   "/",
   validate({ body: CreateMeetingDto }),
