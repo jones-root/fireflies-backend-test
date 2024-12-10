@@ -1,23 +1,36 @@
 import express from "express";
 import { Meeting } from "./meeting.model.js";
 import { AuthenticatedRequest } from "../user/auth.middleware.js";
+import { validate } from "../_core/plugins/yup.js";
+import {
+  CreateMeetingDto,
+  ICreateMeetingDto,
+} from "./dto/create_meeting.dto.js";
 
 export const router = express.Router();
 
 // GET all meetings for user
 router.get("/", async (req: AuthenticatedRequest, res) => {
-  try {
-    const meetings = await Meeting.find();
-    res.json({
-      total: meetings.length,
-      limit: req.query.limit,
-      page: req.query.page,
-      data: meetings,
-    });
-  } catch (err) {
-    res.status(500).json({ message: (err as Error).message });
-  }
+  const meetings = await Meeting.find({}, { __v: 0 });
+
+  res.json({
+    total: meetings.length,
+    limit: req.query.limit,
+    page: req.query.page,
+    data: meetings,
+  });
 });
+
+router.post(
+  "/",
+  validate({ body: CreateMeetingDto }),
+  async (req: AuthenticatedRequest<any, any, ICreateMeetingDto>, res) => {
+    const meeting = new Meeting({ ...req.body, userId: req.userId });
+    const result = await Meeting.create(meeting);
+
+    res.status(201).json(result.toObject({ versionKey: false }));
+  }
+);
 
 // TODO: implement other endpoints
 
