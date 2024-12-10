@@ -1,8 +1,19 @@
 import mongoose from "mongoose";
 
-export async function connectToMongoDB() {
-  const mongoURL = `mongodb://${process.env.MONGO_USERNAME}:${process.env.MONGO_PASSWORD}@${process.env.MONGO_HOST}/${process.env.MONGO_DATABASE}`;
-  await mongoose.connect(mongoURL);
+export async function connectToMongoDB(options?: { isForSeeding?: boolean }) {
+  try {
+    let [host, port] = process.env.MONGO_HOST!.split(":");
 
-  console.log("Connected to MongoDB");
+    // If host is equal to `"mongo"` it is assumed the container is running locally
+    if (options?.isForSeeding && host === "mongo") {
+      host = "127.0.0.1";
+    }
+
+    const mongoURL = `mongodb://${process.env.MONGO_USERNAME}:${process.env.MONGO_PASSWORD}@${host}:${port}/${process.env.MONGO_DATABASE}`;
+    await mongoose.connect(mongoURL);
+
+    console.log("Connected to MongoDB");
+  } catch (error) {
+    console.error("Error while connecting to MongoDB", error);
+  }
 }

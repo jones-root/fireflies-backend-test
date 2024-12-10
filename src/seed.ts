@@ -1,13 +1,11 @@
+import "./env.config.js";
+
 import mongoose from "mongoose";
 import { Meeting, IMeeting } from "./models/meeting.js";
 import { Task, ITask } from "./models/task.js";
+import { connectToMongoDB } from "./mongo.config.js";
 
-const MONGODB_URI = "mongodb://localhost:27017/meetingbot";
-
-await mongoose
-  .connect(MONGODB_URI)
-  .then(() => console.log("Connected to MongoDB for seeding"))
-  .catch((err) => console.error("MongoDB connection error:", err));
+await connectToMongoDB({ isForSeeding: true });
 
 const users = ["user1", "user2", "user3", "user4", "user5"];
 const participants = [
@@ -25,7 +23,7 @@ const participants = [
 
 function randomDate(start: Date, end: Date): Date {
   return new Date(
-    start.getTime() + Math.random() * (end.getTime() - start.getTime()),
+    start.getTime() + Math.random() * (end.getTime() - start.getTime())
   );
 }
 
@@ -78,7 +76,7 @@ async function seedTasks() {
           Math.floor(Math.random() * 3)
         ],
         dueDate: new Date(
-          meeting.date.getTime() + Math.random() * 7 * 24 * 60 * 60 * 1000,
+          meeting.date.getTime() + Math.random() * 7 * 24 * 60 * 60 * 1000
         ), // Random date within a week of the meeting
       });
       tasks.push(task);
