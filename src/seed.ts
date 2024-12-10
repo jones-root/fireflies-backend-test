@@ -1,9 +1,9 @@
-import "./env.config.js";
+import "./_core/plugins/env.config.js";
 
 import mongoose from "mongoose";
 import { Meeting, IMeeting } from "./meeting/meeting.model.js";
 import { Task, ITask } from "./task/task.model.js";
-import { connectToMongoDB } from "./mongo.config.js";
+import { connectToMongoDB } from "./_core/plugins/mongo.config.js";
 
 await connectToMongoDB({ isForSeeding: true });
 
