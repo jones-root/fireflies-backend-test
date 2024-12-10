@@ -1,4 +1,5 @@
 import { NextFunction, Request, Response } from "express";
+import mongoose from "mongoose";
 import Yup from "yup";
 
 export interface IEndpointSchema {
@@ -26,3 +27,13 @@ export function validate({ params, query, body }: IEndpointSchema) {
     }
   };
 }
+
+export const yupMongoId = Yup.object({
+  id: Yup.string()
+    .required()
+    .test({
+      message: "invalid id",
+      test: (value) => mongoose.Types.ObjectId.isValid(value),
+    }),
+});
+export type IYupMongoId = Yup.InferType<typeof yupMongoId>;

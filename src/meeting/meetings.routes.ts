@@ -1,11 +1,16 @@
 import express from "express";
 import { Meeting } from "./meeting.model.js";
 import { AuthenticatedRequest } from "../user/auth.middleware.js";
-import { validate } from "../_core/plugins/yup.js";
+import { IYupMongoId, validate, yupMongoId } from "../_core/plugins/yup.js";
 import {
   CreateMeetingDto,
   ICreateMeetingDto,
 } from "./dto/create_meeting.dto.js";
+import httpErrors from "http-errors";
+import {
+  ISetMeetingTranscriptionDto,
+  SetMeetingTranscriptionDto,
+} from "./dto/set_meeting_transcription.dto.js";
 
 export const router = express.Router();
 
@@ -30,6 +35,28 @@ router.post(
     const result = await Meeting.create(meeting);
 
     res.status(201).json(result.toObject({ versionKey: false }));
+  }
+);
+
+// PUT Update a meeting with its transcript.
+router.put(
+  "/:id/transcript",
+  validate({ params: yupMongoId, body: SetMeetingTranscriptionDto }),
+  async (
+    req: AuthenticatedRequest<IYupMongoId, any, ISetMeetingTranscriptionDto>,
+    res
+  ) => {
+    const meeting = await Meeting.findOneAndUpdate(
+      { _id: req.params.id, userId: req.userId },
+      { $set: { transcript: req.body.transcription } },
+      { new: true }
+    );
+
+    if (!meeting) {
+      throw new httpErrors.NotFound();
+    }
+
+    res.status(201).json(meeting);
   }
 );
 
