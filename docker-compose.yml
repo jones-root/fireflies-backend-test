@@ -1,0 +1,29 @@
+services:
+  api:
+    build:
+      context: ./
+      dockerfile: Dockerfile.development
+    volumes:
+      - .:/usr/app
+      - /usr/app/node_modules
+    env_file: .env
+    command: npm run start:dev
+    depends_on:
+      - mongo
+    ports:
+      - $PORT:$PORT
+  mongo:
+    image: mongo
+    restart: on-failure
+    volumes:
+      - mongo-data:/data
+      - ./init_mongodb_db.js:/docker-entrypoint-initdb.d/init_mongodb_db.js:ro
+    environment:
+      MONGO_INITDB_DATABASE: $MONGO_DATABASE
+      MONGO_INITDB_ROOT_USERNAME: $MONGO_USERNAME
+      MONGO_INITDB_ROOT_PASSWORD: $MONGO_PASSWORD
+    ports:
+      - 27017:27017
+
+volumes:
+  mongo-data:
