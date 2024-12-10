@@ -2,10 +2,10 @@
 import "./env.config.js";
 
 import express from "express";
-import { meetingRoutes } from "./routes/meetings.js";
-import { taskRoutes } from "./routes/task.router.js";
-import { dashboardRoutes } from "./routes/dashboardRoutes.js";
-import { authMiddleware } from "./auth.middleware.js";
+import { meetingRoutes } from "./meeting/meetings.routes.js";
+import { taskRoutes } from "./task/task.router.js";
+import { dashboardRoutes } from "./dashboard/dashboardRoutes.js";
+import { authMiddleware } from "./user/auth.middleware.js";
 import { connectToMongoDB } from "./mongo.config.js";
 
 // It should prevent app from starting if MongoDB connection fails
