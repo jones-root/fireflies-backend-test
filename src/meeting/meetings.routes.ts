@@ -31,7 +31,7 @@ router.get("/stats", async (req: AuthenticatedRequest, res, next) => {
   const days = meetingsResult.meetingsByDayOfWeek ?? [];
   const { distinctParticipants } =
     meetingsResult.distinctParticipants?.[0] ?? {};
-  const tasksDistribution = tasksResult.tasksStats ?? [];
+  const tasksDistribution = tasksResult.tasksDistribution ?? [];
 
   const participantDiversity = distinctParticipants?.length ?? 0;
 

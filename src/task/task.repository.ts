@@ -17,22 +17,36 @@ export const taskRepository = {
     );
   },
 
-  async getAnalyticsByUserId(userId: string) {
-    const [tasksResult] = await Task.aggregate([
+  async getDashboardByUserId(userId: string) {
+    const now = new Date();
+
+    const [result] = await Task.aggregate([
       { $match: { userId } },
       {
         $facet: {
-          tasksStats: [
+          tasksDistribution: this._tasksDistributionAggregation,
+          overdueTasks: [
             {
-              $group: {
-                _id: "$status",
-                count: { $sum: 1 },
+              $lookup: {
+                from: "meetings",
+                localField: "meetingId",
+                foreignField: "_id",
+                as: "meeting",
+              },
+            },
+            {
+              $match: {
+                dueDate: { $lt: now },
+                status: { $ne: "completed" },
               },
             },
             {
               $project: {
-                status: "$_id",
-                count: 1,
+                _id: 1,
+                title: 1,
+                dueDate: 1,
+                meetingId: 1,
+                meetingTitle: { $arrayElemAt: ["$meeting.title", 0] },
               },
             },
           ],
@@ -40,6 +54,32 @@ export const taskRepository = {
       },
     ]);
 
-    return tasksResult;
+    return result;
+  },
+
+  async getAnalyticsByUserId(userId: string) {
+    const [result] = await Task.aggregate([
+      { $match: { userId } },
+      { $facet: { tasksDistribution: this._tasksDistributionAggregation } },
+    ]);
+
+    return result;
+  },
+
+  get _tasksDistributionAggregation() {
+    return [
+      {
+        $group: {
+          _id: "$status",
+          count: { $sum: 1 },
+        },
+      },
+      {
+        $project: {
+          status: "$_id",
+          count: 1,
+        },
+      },
+    ];
   },
 };

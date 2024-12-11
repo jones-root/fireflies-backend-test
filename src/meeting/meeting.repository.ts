@@ -2,6 +2,7 @@ import { IPaginationDto } from "../_core/dto/pagination.dto";
 import { IMeeting, Meeting } from "./meeting.model";
 
 export const meetingRepository = {
+  /** It's mapped to `findAndModify` in MongoDB. Only 1 query is performed. */
   async updateAndGet(
     { id, ...criteria }: Partial<Pick<IMeeting, "id" | "userId">>,
     partial: Partial<IMeeting>
@@ -38,11 +39,36 @@ export const meetingRepository = {
     );
   },
 
-  async getAnalyticsByUserId(userId: string) {
-    const [meetingsResult] = await Meeting.aggregate([
+  async getDashboardByUserId(userId: string) {
+    const now = new Date();
+    const [result] = await Meeting.aggregate([
+      { $match: { userId } },
       {
-        $match: { userId },
+        $facet: {
+          totalMeetings: [{ $count: "count" }],
+          upcomingMeetings: [
+            { $match: { date: { $gte: now } } },
+            { $sort: { date: 1 } },
+            { $limit: 5 },
+            {
+              $project: {
+                _id: 1,
+                title: 1,
+                date: 1,
+                participantCount: { $size: "$participants" },
+              },
+            },
+          ],
+        },
       },
+    ]);
+
+    return result;
+  },
+
+  async getAnalyticsByUserId(userId: string) {
+    const [result] = await Meeting.aggregate([
+      { $match: { userId } },
       {
         $project: {
           _id: 1,
@@ -113,6 +139,6 @@ export const meetingRepository = {
       },
     ]);
 
-    return meetingsResult;
+    return result;
   },
 };

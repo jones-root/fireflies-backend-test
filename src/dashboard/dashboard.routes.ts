@@ -4,15 +4,17 @@ import { AuthenticatedRequest } from "../user/auth.middleware.js";
 import { Meeting } from "../meeting/meeting.model.js";
 import { Task } from "../task/task.model.js";
 import { Types } from "mongoose";
+import { meetingRepository } from "../meeting/meeting.repository.js";
+import { taskRepository } from "../task/task.repository.js";
 
-interface UpcomingMeeting {
+interface IUpcomingMeeting {
   _id: Types.ObjectId;
   title: string;
   date: Date;
   participantCount: number;
 }
 
-interface OverdueTask {
+interface IOverdueTask {
   _id: Types.ObjectId;
   title: string;
   dueDate: Date;
@@ -20,56 +22,55 @@ interface OverdueTask {
   meetingTitle: string;
 }
 
-interface DashboardData {
+interface IDashboardData {
   totalMeetings: number;
   taskSummary: {
     pending: number;
     inProgress: number;
     completed: number;
   };
-  upcomingMeetings: UpcomingMeeting[];
-  overdueTasks: OverdueTask[];
+  upcomingMeetings: IUpcomingMeeting[];
+  overdueTasks: IOverdueTask[];
 }
 
 const router = express.Router();
 
 router.get("/", async (req: AuthenticatedRequest, res) => {
-  // TODO: fix this
-  // it should be sorted by date, only include upcoming meetings, limit to 5 and only include the _id, title, date, and participantCount fields
-  const upcomingMeetings = (await Meeting.find()).map((meeting) => {
-    return {
-      _id: meeting._id as mongoose.Types.ObjectId,
-      title: meeting.title,
-      date: meeting.date,
-      participantCount: meeting.participants.length,
-    };
+  const [meetingsResult, tasksResult] = await Promise.all([
+    meetingRepository.getDashboardByUserId(req.userId!),
+    taskRepository.getDashboardByUserId(req.userId!),
+  ]);
+
+  const taskSummary = {
+    pending: 0,
+    inProgress: 0,
+    completed: 0,
+  };
+
+  tasksResult.tasksDistribution?.forEach((item: any) => {
+    switch (item.status) {
+      case "completed": {
+        taskSummary.completed = item.count;
+        break;
+      }
+      case "in-progress": {
+        taskSummary.inProgress = item.count;
+        break;
+      }
+      case "pending": {
+        taskSummary.pending = item.count;
+        break;
+      }
+    }
   });
 
-  const dashboardData: DashboardData = {
-    totalMeetings: (await Meeting.find()).length,
-    taskSummary: {
-      pending: 10,
-      inProgress: 5,
-      completed: 2,
-    },
-    upcomingMeetings,
-    // TODO: need to lookup meeting title from meeting collection
-    overdueTasks: [
-      {
-        _id: new mongoose.Types.ObjectId(),
-        title: "Task 1",
-        dueDate: new Date(),
-        meetingId: new mongoose.Types.ObjectId(),
-        meetingTitle: "Meeting 1",
-      },
-      {
-        _id: new mongoose.Types.ObjectId(),
-        title: "Task 2",
-        dueDate: new Date(),
-        meetingId: new mongoose.Types.ObjectId(),
-        meetingTitle: "Meeting 2",
-      },
-    ],
+  const { count: totalMeetings } = meetingsResult.totalMeetings?.[0] ?? {};
+
+  const dashboardData: IDashboardData = {
+    totalMeetings,
+    taskSummary,
+    upcomingMeetings: meetingsResult.upcomingMeetings ?? [],
+    overdueTasks: tasksResult.overdueTasks ?? [],
   };
 
   res.json(dashboardData);
