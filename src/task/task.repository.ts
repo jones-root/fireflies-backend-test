@@ -14,14 +14,14 @@ export const taskRepository = {
 	},
 
 	async getAll(
-		{ id, ...criteria }: Partial<Pick<ITask, "id" | "userId" | "meetingId">>,
+		criteria: Partial<ITask>,
 		{ page, limit }: IPaginationDto = {
 			page: 1,
 			limit: DEFAULT_PAGINATION_LIMIT,
 		},
 	) {
 		return Task.find(
-			{ _id: id, ...criteria },
+			<any>criteria,
 			{ __v: 0 },
 			{
 				sort: { date: -1 },
@@ -63,6 +63,7 @@ export const taskRepository = {
 								title: 1,
 								dueDate: 1,
 								meetingId: 1,
+								status: 1,
 								meetingTitle: { $arrayElemAt: ["$meeting.title", 0] }, // It should always return 1 meeting from $lookup
 							},
 						},

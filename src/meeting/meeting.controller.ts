@@ -103,7 +103,7 @@ export const meetingController = {
 
 	async updateMyEndedMeeting(req: AuthenticatedRequest<IYupMongoId, any, IUpdateEndedMeetingDto>): Promise<IMeeting> {
 		const meeting = await meetingRepository.updateAndGet(
-			{ id: req.params.id, userId: req.userId! },
+			{ _id: <any>req.params.id, userId: req.userId! },
 			{ transcript: req.body.transcript, duration: req.body.duration },
 		);
 

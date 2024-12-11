@@ -10,8 +10,8 @@ export const meetingRepository = {
 	},
 
 	/** It's mapped to `findAndModify` in MongoDB. Only 1 query is performed. */
-	async updateAndGet({ id, ...criteria }: Partial<Pick<IMeeting, "id" | "userId">>, partial: Partial<IMeeting>) {
-		const meeting = await Meeting.findOneAndUpdate({ _id: id, ...criteria }, { $set: partial }, { new: true });
+	async updateAndGet(criteria: Partial<IMeeting>, partial: Partial<IMeeting>) {
+		const meeting = await Meeting.findOneAndUpdate(<any>criteria, { $set: partial }, { new: true });
 
 		if (meeting) {
 			return meeting.toObject({ versionKey: false });
@@ -53,7 +53,8 @@ export const meetingRepository = {
 				$facet: {
 					totalMeetings: [{ $count: "count" }],
 					upcomingMeetings: [
-						{ $match: { date: { $gte: now } } },
+						// Return only meetings schedule to after now and meetings that didn't happened (where `transcript` is not set)
+						{ $match: { date: { $gte: now }, transcript: { $in: [null, undefined] } } },
 						{ $sort: { date: 1 } },
 						{ $limit: 5 },
 						{
@@ -93,7 +94,10 @@ export const meetingRepository = {
 					summary: 1,
 					actionItems: 1,
 					duration: 1,
-					transcriptLength: { $strLenCP: { $ifNull: ["$transcript", ""] } },
+					transcriptLength: {
+						// Only set transcripts are considered to calculate the average
+						$cond: [{ $and: [{ $ifNull: ["$transcript", false] }] }, { $strLenCP: "$transcript" }, null],
+					},
 				},
 			},
 			{
@@ -122,7 +126,7 @@ export const meetingRepository = {
 							},
 						},
 						{ $project: { participant: "$_id", meetingCount: 1 } },
-						{ $sort: { meetingCount: -1 } },
+						{ $sort: { meetingCount: -1, participant: 1 } }, // Order by meeting count and then alphabetically by participant name
 						{ $limit: 5 },
 					],
 					meetingsByDayOfWeek: [

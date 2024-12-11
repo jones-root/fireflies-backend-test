@@ -20,7 +20,11 @@ export interface IMeeting extends Document {
 	 */
 	participants: string[];
 
-	/** Meeting transcript */
+	/**
+	 * Meeting transcript.
+	 *
+	 * If the transcript is set, it means the meeting already happened and was processed.
+	 */
 	transcript: string;
 
 	/** Duration in minutes */
@@ -54,10 +58,7 @@ const meetingSchema = new Schema<IMeeting>({
 		type: [String],
 		required: true,
 	},
-	duration: {
-		type: Number,
-		default: 30,
-	},
+	duration: Number,
 	transcript: String,
 	summary: String,
 	actionItems: [String],
