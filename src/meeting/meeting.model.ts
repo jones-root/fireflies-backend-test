@@ -1,6 +1,8 @@
 import mongoose, { Document, Schema } from "mongoose";
+import { ITask } from "../task/task.model";
 
 export interface IMeeting extends Document {
+  _id: mongoose.Types.ObjectId;
   userId: string;
   title: string;
   date: Date;
@@ -8,6 +10,9 @@ export interface IMeeting extends Document {
   transcript: string;
   summary: string;
   actionItems: string[];
+
+  // local
+  tasks: ITask[];
 }
 
 const meetingSchema = new Schema<IMeeting>({

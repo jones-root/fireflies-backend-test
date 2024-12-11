@@ -11,6 +11,8 @@ import {
   ISetMeetingTranscriptionDto,
   SetMeetingTranscriptionDto,
 } from "./dto/set_meeting_transcription.dto.js";
+import { llm } from "../_core/plugins/llm.js";
+import { Task } from "../task/task.model.js";
 
 export const router = express.Router();
 
@@ -57,6 +59,45 @@ router.put(
     }
 
     res.status(201).json(meeting);
+  }
+);
+
+// Generate summary, action items and tasks for a meeting
+router.post(
+  "/:id/summarize",
+  validate({ params: yupMongoId }),
+  async (req: AuthenticatedRequest, res) => {
+    const meeting = await Meeting.findOne({
+      _id: req.params.id,
+      userId: req.userId,
+    });
+
+    if (!meeting) {
+      throw new httpErrors.NotFound();
+    }
+
+    if (!meeting.transcript) {
+      throw new httpErrors.BadRequest(
+        "The transcription for this meeting is not ready."
+      );
+    }
+
+    const { summary, tasks } = await llm.summarizeMeeting(req.userId!, meeting);
+    meeting.summary = summary;
+    meeting.actionItems = tasks.map(({ title }) => title);
+
+    // TODO Use single mongodb replica to allow transactions
+    await meeting.updateOne({
+      summary: meeting.summary,
+      actionItems: meeting.actionItems,
+    });
+
+    await Task.insertMany(tasks);
+
+    const response = { ...meeting.toObject({ versionKey: false }) };
+    response.tasks = tasks.map((task) => task.toObject({ versionKey: false }));
+
+    res.status(201).json(response);
   }
 );
 
