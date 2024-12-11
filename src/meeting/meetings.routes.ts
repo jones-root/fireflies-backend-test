@@ -42,6 +42,26 @@ router.get(
   }
 );
 
+router.get(
+  "/:id",
+  validate({ params: yupMongoId }),
+  async (req: AuthenticatedRequest<IYupMongoId>, res) => {
+    const meeting = await Meeting.findOne(
+      { _id: req.params.id, userId: req.userId },
+      { __v: 0 }
+    );
+
+    if (!meeting) {
+      throw new httpErrors.NotFound();
+    }
+
+    const response = meeting.toJSON();
+    response.tasks = await Task.find({ meetingId: req.params.id }, { __v: 0 });
+
+    res.json(response);
+  }
+);
+
 // POST create a meeting
 router.post(
   "/",
@@ -108,7 +128,7 @@ router.post(
 
     await Task.insertMany(tasks);
 
-    const response = { ...meeting.toObject({ versionKey: false }) };
+    const response = meeting.toObject({ versionKey: false }).toJSON();
     response.tasks = tasks.map((task) => task.toObject({ versionKey: false }));
 
     res.status(201).json(response);
