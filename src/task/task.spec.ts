@@ -1,7 +1,7 @@
-import { Meeting } from "../meeting/meeting.model";
-import { AuthenticatedRequest } from "../user/auth.middleware";
-import { taskController } from "./task.controller";
-import { taskRepository } from "./task.repository";
+import { Meeting } from "../meeting/meeting.model.js";
+import { AuthenticatedRequest } from "../user/auth.middleware.js";
+import { taskController } from "./task.controller.js";
+import { taskRepository } from "./task.repository.js";
 
 jest.mock("./task.repository.ts", () => {
 	return {

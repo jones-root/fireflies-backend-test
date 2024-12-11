@@ -1,10 +1,10 @@
-import "./_core/plugins/env.config";
+import "./_core/plugins/env.config.js";
 
 import mongoose from "mongoose";
-import { Meeting, IMeeting } from "./meeting/meeting.model";
-import { Task, ITask } from "./task/task.model";
-import { connectToMongoDB } from "./_core/plugins/mongo.config";
-import { futureDate, randomDate, randomNumber } from "./_core/utils/index";
+import { Meeting, IMeeting } from "./meeting/meeting.model.js";
+import { Task, ITask } from "./task/task.model.js";
+import { connectToMongoDB } from "./_core/plugins/mongo.config.js";
+import { futureDate, randomDate, randomNumber } from "./_core/utils/index.js";
 
 await connectToMongoDB({ isForSeeding: true });
 

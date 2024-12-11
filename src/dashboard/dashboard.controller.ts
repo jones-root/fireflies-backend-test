@@ -1,7 +1,7 @@
-import { meetingRepository } from "../meeting/meeting.repository";
-import { taskRepository } from "../task/task.repository";
-import { AuthenticatedRequest } from "../user/auth.middleware";
-import { IDashboardDataDto } from "./dto/get_dashboard_response.dto";
+import { meetingRepository } from "../meeting/meeting.repository.js";
+import { taskRepository } from "../task/task.repository.js";
+import { AuthenticatedRequest } from "../user/auth.middleware.js";
+import { IDashboardDataDto } from "./dto/get_dashboard_response.dto.js";
 
 export const dashboardController = {
 	async getMyDashboard(req: AuthenticatedRequest): Promise<IDashboardDataDto> {

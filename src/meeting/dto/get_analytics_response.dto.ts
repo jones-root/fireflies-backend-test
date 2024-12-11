@@ -1,4 +1,4 @@
-import { TaskStatus } from "../../task/task.model";
+import { TaskStatus } from "../../task/task.model.js";
 
 export interface GeneralAnalytics {
 	totalMeetings: number;

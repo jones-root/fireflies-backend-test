@@ -1,5 +1,5 @@
 import { Types } from "mongoose";
-import { TaskStatus } from "../../task/task.model";
+import { TaskStatus } from "../../task/task.model.js";
 
 export interface IUpcomingMeeting {
 	_id: Types.ObjectId;

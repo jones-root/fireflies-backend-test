@@ -1,8 +1,8 @@
-import { IPaginationDto } from "../_core/dto/pagination.dto";
-import { DEFAULT_PAGINATION_LIMIT } from "../constants";
-import { IUpcomingMeeting } from "../dashboard/dto/get_dashboard_response.dto";
-import { GeneralAnalytics, MeetingsByTheOfWeek, TopParticipant } from "./dto/get_analytics_response.dto";
-import { IMeeting, Meeting } from "./meeting.model";
+import { IPaginationDto } from "../_core/dto/pagination.dto.js";
+import { DEFAULT_PAGINATION_LIMIT } from "../constants.js";
+import { IUpcomingMeeting } from "../dashboard/dto/get_dashboard_response.dto.js";
+import { GeneralAnalytics, MeetingsByTheOfWeek, TopParticipant } from "./dto/get_analytics_response.dto.js";
+import { IMeeting, Meeting } from "./meeting.model.js";
 
 export const meetingRepository = {
 	async insert(meeting: IMeeting) {

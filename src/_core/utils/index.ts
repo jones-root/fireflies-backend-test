@@ -1,2 +1,2 @@
-export * from "./promise";
-export * from "./misc";
+export * from "./promise.js";
+export * from "./misc.js";

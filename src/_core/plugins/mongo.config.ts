@@ -2,6 +2,8 @@ import mongoose from "mongoose";
 
 export async function connectToMongoDB(options?: { isForSeeding?: boolean }) {
 	try {
+		console.log("Will try to connect with MongoDB");
+
 		let [host, port] = process.env.MONGO_HOST!.split(":");
 
 		// If host is equal to `"mongo"` it is assumed the container is running locally

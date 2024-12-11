@@ -1,20 +1,20 @@
 // Env vars must be loaded from a separate module because in ESModules modules are loaded and executed before any of the importing module code
-import "./_core/plugins/env.config";
+import "./_core/plugins/env.config.js";
 
 // Directly calls next() on async errors preventing the need for manual try/catch in endpoints
 import "express-async-errors";
 
 import express from "express";
 import cors, { CorsOptions } from "cors";
-
-import { meetingRoutes } from "./meeting/meetings.routes";
-import { taskRoutes } from "./task/task.routes";
-import { dashboardRoutes } from "./dashboard/dashboard.routes";
-import { authMiddleware } from "./user/auth.middleware";
-import { connectToMongoDB } from "./_core/plugins/mongo.config";
-import { globalErrorHandler } from "./_core/plugins/global_error_handler";
 import httpErrors from "http-errors";
-import { IS_DEV } from "./constants";
+
+import { meetingRoutes } from "./meeting/meetings.routes.js";
+import { taskRoutes } from "./task/task.routes.js";
+import { dashboardRoutes } from "./dashboard/dashboard.routes.js";
+import { authMiddleware } from "./user/auth.middleware.js";
+import { connectToMongoDB } from "./_core/plugins/mongo.config.js";
+import { globalErrorHandler } from "./_core/plugins/global_error_handler.js";
+import { IS_DEV } from "./constants.js";
 
 // It should prevent app from starting if MongoDB connection fails
 await connectToMongoDB();

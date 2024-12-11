@@ -12,6 +12,7 @@
 		"start:docker": "docker-compose up",
 		"build": "tsc --project tsconfig.build.json",
 		"seed": "tsx src/seed.ts",
+		"ts-check": "tsc --noUnusedLocals --noEmit --incremental false",
 		"format": "prettier --write .",
 		"format-check": "prettier --check .",
 		"test": "jest",

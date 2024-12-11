@@ -1,7 +1,7 @@
-import { IPaginationDto } from "../_core/dto/pagination.dto";
-import { ITask, Task, TaskStatus } from "./task.model";
-import { IOverdueTask } from "../dashboard/dto/get_dashboard_response.dto";
-import { DEFAULT_PAGINATION_LIMIT } from "../constants";
+import { IPaginationDto } from "../_core/dto/pagination.dto.js";
+import { ITask, Task, TaskStatus } from "./task.model.js";
+import { IOverdueTask } from "../dashboard/dto/get_dashboard_response.dto.js";
+import { DEFAULT_PAGINATION_LIMIT } from "../constants.js";
 
 export interface ITaskStatusCount {
 	status: TaskStatus;

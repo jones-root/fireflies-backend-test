@@ -1,5 +1,5 @@
 import mongoose, { Document, Schema } from "mongoose";
-import { ITask } from "../task/task.model";
+import { ITask } from "../task/task.model.js";
 
 export interface IMeeting extends Document {
 	_id: mongoose.Types.ObjectId;

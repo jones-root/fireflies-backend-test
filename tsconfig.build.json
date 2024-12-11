@@ -4,5 +4,6 @@
 		"sourceMap": true,
 		"inlineSources": true,
 		"removeComments": true
-	}
+	},
+	"exclude": ["**/*spec.ts"]
 }

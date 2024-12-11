@@ -1,14 +1,14 @@
 import express from "express";
 
-import { AuthenticatedRequest } from "../user/auth.middleware";
-import { IYupMongoId, validate, yupMongoId } from "../_core/plugins/yup";
-import { CreateMeetingDto, ICreateMeetingDto } from "./dto/create_meeting.dto";
+import { AuthenticatedRequest } from "../user/auth.middleware.js";
+import { IYupMongoId, validate, yupMongoId } from "../_core/plugins/yup.js";
+import { CreateMeetingDto, ICreateMeetingDto } from "./dto/create_meeting.dto.js";
 
-import { IUpdateEndedMeetingDto, UpdateEndedMeetingDto } from "./dto/update_ended_meeting.dto";
+import { IUpdateEndedMeetingDto, UpdateEndedMeetingDto } from "./dto/update_ended_meeting.dto.js";
 
-import { IPaginationDto, PaginationDto } from "../_core/dto/pagination.dto";
+import { IPaginationDto, PaginationDto } from "../_core/dto/pagination.dto.js";
 
-import { meetingController } from "./meeting.controller";
+import { meetingController } from "./meeting.controller.js";
 
 export const router = express.Router();
 

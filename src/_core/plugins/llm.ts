@@ -1,6 +1,6 @@
-import { IMeeting } from "../../meeting/meeting.model";
-import { ITask, Task } from "../../task/task.model";
-import { futureDate, randomNumber, sleep } from "../utils";
+import { IMeeting } from "../../meeting/meeting.model.js";
+import { ITask, Task } from "../../task/task.model.js";
+import { futureDate, randomNumber, sleep } from "../utils/index.js";
 
 export const llm = {
 	async summarizeMeeting(userId: string, meeting: IMeeting): Promise<{ summary: string; tasks: ITask[] }> {
