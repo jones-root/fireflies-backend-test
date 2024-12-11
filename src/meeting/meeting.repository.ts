@@ -80,7 +80,7 @@ export const meetingRepository = {
           summary: 1,
           actionItems: 1,
           duration: 1,
-          transcriptLength: { $strLenCP: "$transcript" },
+          transcriptLength: { $strLenCP: { $ifNull: ["$transcript", ""] } },
         },
       },
       {
