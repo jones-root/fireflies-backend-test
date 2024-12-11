@@ -17,5 +17,6 @@ export async function connectToMongoDB(options?: { isForSeeding?: boolean }) {
 		console.log("Connected to MongoDB");
 	} catch (error) {
 		console.error("Error while connecting to MongoDB", error);
+		process.exit(1);
 	}
 }

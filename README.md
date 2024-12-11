@@ -9,9 +9,13 @@
 
 - Create a `.env` file from the `.env.template`.
 - Run `npm install`
-- Run `npm run start:docker` to spin up a standalone MongoDB container and the api container.
-	
-	If you don't have docker, you should setup a MongoDB connection via the variables in your `.env` and then run `npm run start:dev`.
+- To start **with docker** _(preferable)_:
+
+	Execute `npm run start:docker` to spin up a standalone MongoDB container and the api container.
+
+- To start **without docker**:
+
+	Setup a MongoDB connection via the variables in your `.env` and then run `npm run start:dev`.
 - You can run optionally `npm run seed` to seed the database with mocked data.
 
 ### Testing
@@ -20,9 +24,15 @@
 
 ### Build
 
-- Run `npm run build` and `npm run start` to test the build version locally.
+- Build **with docker** _(preferable)_:
 
-	You can also build and image of the container based on the `Dockerfile`.
+	Run `docker build -t fireflies-api .`
+
+	To run the container api with the local MongoDB container: `docker run -p 3000:3000 --network fireflies-network fireflies-api`;
+
+- Build **without docker**:
+
+	Run `npm run build` and `npm run start` to test the build version locally.
 
 ### Formatting
 

@@ -3,6 +3,8 @@ services:
     build:
       context: ./
       dockerfile: Dockerfile.development
+    networks:
+      - fireflies-network
     volumes:
       - .:/usr/app
       - /usr/app/node_modules
@@ -15,6 +17,8 @@ services:
   mongo:
     image: mongo
     restart: on-failure
+    networks:
+      - fireflies-network
     volumes:
       - mongo-data:/data
       - ./init_mongodb_db.js:/docker-entrypoint-initdb.d/init_mongodb_db.js:ro
@@ -27,3 +31,7 @@ services:
 
 volumes:
   mongo-data:
+
+networks:
+  fireflies-network:
+    name: fireflies-network
