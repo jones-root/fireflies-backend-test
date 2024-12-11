@@ -41,10 +41,10 @@ async function seedMeetings() {
       participants: randomParticipants(),
       transcript: `This is a sample transcript for meeting ${i + 1}.`,
       summary: `Summary of meeting ${i + 1}`,
-      actionItems: [
-        `Action item 1 for meeting ${i + 1}`,
-        `Action item 2 for meeting ${i + 1}`,
-      ],
+      duration: randomNumber(15, 90),
+      actionItems: Array.from({ length: randomNumber(1, 6) }).map(
+        (_, i) => `Action item 1 for meeting ${i + 1}`
+      ),
     });
     meetings.push(meeting);
   }

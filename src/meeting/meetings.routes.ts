@@ -8,14 +8,75 @@ import {
 } from "./dto/create_meeting.dto.js";
 import httpErrors from "http-errors";
 import {
-  ISetMeetingTranscriptionDto,
-  SetMeetingTranscriptionDto,
-} from "./dto/set_meeting_transcription.dto.js";
+  IUpdateEndedMeetingDto,
+  UpdateEndedMeetingDto,
+} from "./dto/update_ended_meeting.dto.js";
 import { llm } from "../_core/plugins/llm.js";
 import { Task } from "../task/task.model.js";
 import { IPaginationDto, PaginationDto } from "../_core/dto/pagination.dto.js";
+import { meetingRepository } from "./meeting.repository.js";
+import { taskRepository } from "../task/task.repository.js";
 
 export const router = express.Router();
+
+// GET return statistics about meetings
+router.get("/stats", async (req: AuthenticatedRequest, res, next) => {
+  const [meetingsResult, tasksResult] = await Promise.all([
+    meetingRepository.getAnalyticsByUserId(req.userId!),
+    taskRepository.getAnalyticsByUserId(req.userId!),
+  ]);
+
+  const general = meetingsResult.generalStats?.[0] ?? {};
+  const topParticipants = meetingsResult.topParticipants ?? [];
+  const days = meetingsResult.meetingsByDayOfWeek ?? [];
+  const { distinctParticipants } =
+    meetingsResult.distinctParticipants?.[0] ?? {};
+  const tasksDistribution = tasksResult.tasksStats ?? [];
+
+  const participantDiversity = distinctParticipants?.length ?? 0;
+
+  const meetingsByDayOfWeek = days
+    .map((item: any) => ({
+      dayOfWeek: item.dayOfWeek, // 1 - Sunday ... 7 - Saturday
+      count: item.count,
+    }))
+    .sort((left: any, right: any) => left.dayOfWeek - right.dayOfWeek);
+
+  const totalTasks = tasksDistribution.reduce(
+    (total: number, current: any) => total + current.count,
+    0
+  );
+
+  const taskStatusDistribution = tasksDistribution.map((item: any) => ({
+    status: item.status,
+    count: item.count,
+    percentage: item.count / totalTasks,
+  }));
+
+  const response = {
+    generalStats: {
+      totalMeetings: general.totalMeetings ?? 0,
+      averageParticipants: general.averageParticipants ?? 0,
+      totalParticipants: general.totalParticipants ?? 0,
+      participantDiversity: participantDiversity ?? 0, // Total of unique participants
+      shortestMeeting: general.shortestMeeting ?? 0,
+      longestMeeting: general.longestMeeting ?? 0,
+      averageDuration: general.averageDuration ?? 0,
+      averageTranscriptLength: general.averageTranscriptLength ?? 0,
+      averageActionItems: general.averageActionItems ?? 0, // Equivalent to total number os tasks
+    },
+    topParticipants: topParticipants.map((item: any) => ({
+      participant: item.name,
+      meetingCount: item.meetingCount,
+    })),
+    meetingsByDayOfWeek,
+    tasksStats: {
+      distribution: taskStatusDistribution, // Count of tasks with a specific status
+    },
+  };
+
+  res.json(response);
+});
 
 // GET all meetings for requesting user
 // The query should be in the format ?json={"limit":0,"page":0}
@@ -78,14 +139,16 @@ router.post(
 // PUT Update a meeting with its transcript.
 router.put(
   "/:id/transcript",
-  validate({ params: yupMongoId, body: SetMeetingTranscriptionDto }),
+  validate({ params: yupMongoId, body: UpdateEndedMeetingDto }),
   async (
-    req: AuthenticatedRequest<IYupMongoId, any, ISetMeetingTranscriptionDto>,
+    req: AuthenticatedRequest<IYupMongoId, any, IUpdateEndedMeetingDto>,
     res
   ) => {
     const meeting = await Meeting.findOneAndUpdate(
       { _id: req.params.id, userId: req.userId },
-      { $set: { transcript: req.body.transcription } },
+      {
+        $set: { transcript: req.body.transcript, duration: req.body.duration },
+      },
       { new: true }
     );
 
@@ -136,41 +199,6 @@ router.post(
   }
 );
 
-// TODO: implement other endpoints
-
-router.get("/stats", async (req: AuthenticatedRequest, res) => {
-  try {
-    // TODO: get statistics from the database
-    const stats = {
-      generalStats: {
-        totalMeetings: 100,
-        averageParticipants: 4.75,
-        totalParticipants: 475,
-        shortestMeeting: 15,
-        longestMeeting: 120,
-        averageDuration: 45.3,
-      },
-      topParticipants: [
-        { participant: "John Doe", meetingCount: 20 },
-        { participant: "Jane Smith", meetingCount: 18 },
-        { participant: "Bob Johnson", meetingCount: 15 },
-        { participant: "Alice Brown", meetingCount: 12 },
-        { participant: "Charlie Davis", meetingCount: 10 },
-      ],
-      meetingsByDayOfWeek: [
-        { dayOfWeek: 1, count: 10 },
-        { dayOfWeek: 2, count: 22 },
-        { dayOfWeek: 3, count: 25 },
-        { dayOfWeek: 4, count: 20 },
-        { dayOfWeek: 5, count: 18 },
-        { dayOfWeek: 6, count: 5 },
-        { dayOfWeek: 7, count: 0 },
-      ],
-    };
-    res.json(stats);
-  } catch (err) {
-    res.status(500).json({ message: (err as Error).message });
-  }
-});
+export default router;
 
 export { router as meetingRoutes };

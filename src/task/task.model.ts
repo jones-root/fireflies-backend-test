@@ -2,11 +2,27 @@ import mongoose, { Document, Schema } from "mongoose";
 
 export interface ITask extends Document {
   _id: mongoose.Types.ObjectId;
+
+  /** Related meeting ID */
   meetingId: mongoose.Types.ObjectId;
+
+  /**
+   * Owner of the related meeting.
+   *
+   * TODO: Allow to distribute/attach tasks to participants.
+   */
   userId: string;
+
+  /** Title of the task */
   title: string;
+
+  /** Specifics of the task */
   description: string;
+
+  /** Status */
   status: "pending" | "in-progress" | "completed";
+
+  /** Due date */
   dueDate: Date;
 }
 
