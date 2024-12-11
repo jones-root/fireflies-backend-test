@@ -1,81 +1,26 @@
 import express from "express";
-import { Meeting } from "./meeting.model.js";
+
 import { AuthenticatedRequest } from "../user/auth.middleware.js";
 import { IYupMongoId, validate, yupMongoId } from "../_core/plugins/yup.js";
 import {
   CreateMeetingDto,
   ICreateMeetingDto,
 } from "./dto/create_meeting.dto.js";
-import httpErrors from "http-errors";
+
 import {
   IUpdateEndedMeetingDto,
   UpdateEndedMeetingDto,
 } from "./dto/update_ended_meeting.dto.js";
-import { llm } from "../_core/plugins/llm.js";
-import { Task } from "../task/task.model.js";
+
 import { IPaginationDto, PaginationDto } from "../_core/dto/pagination.dto.js";
-import { meetingRepository } from "./meeting.repository.js";
-import { taskRepository } from "../task/task.repository.js";
-import { GetAnalyticsResponseDto } from "./dto/get_analytics_response.dto.js";
+
+import { meetingController } from "./meeting.controller.js";
 
 export const router = express.Router();
 
 // GET return statistics about meetings
-router.get("/stats", async (req: AuthenticatedRequest, res, next) => {
-  const [meetingsResult, tasksResult] = await Promise.all([
-    meetingRepository.getAnalyticsByUserId(req.userId!),
-    taskRepository.getAnalyticsByUserId(req.userId!),
-  ]);
-
-  const general = meetingsResult.generalStats?.[0] ?? {};
-  const topParticipants = meetingsResult.topParticipants ?? [];
-  const days = meetingsResult.meetingsByDayOfWeek ?? [];
-  const { distinctParticipants } =
-    meetingsResult.distinctParticipants?.[0] ?? {};
-  const tasksDistribution = tasksResult.tasksDistribution ?? [];
-
-  const participantDiversity = distinctParticipants?.length ?? 0;
-
-  const meetingsByDayOfWeek = days
-    .map((item) => ({
-      dayOfWeek: item.dayOfWeek, // 1 - Sunday ... 7 - Saturday
-      count: item.count,
-    }))
-    .sort((left, right) => left.dayOfWeek - right.dayOfWeek);
-
-  const totalTasks = tasksDistribution.reduce(
-    (total: number, current) => total + current.count,
-    0
-  );
-
-  const taskStatusDistribution = tasksDistribution.map((item) => ({
-    status: item.status,
-    count: item.count,
-    percentage: item.count / totalTasks,
-  }));
-
-  const response: GetAnalyticsResponseDto = {
-    generalStats: {
-      totalMeetings: general.totalMeetings ?? 0,
-      averageParticipants: general.averageParticipants ?? 0,
-      totalParticipants: general.totalParticipants ?? 0,
-      participantDiversity: participantDiversity ?? 0, // Total of unique participants
-      shortestMeeting: general.shortestMeeting ?? 0,
-      longestMeeting: general.longestMeeting ?? 0,
-      averageDuration: general.averageDuration ?? 0,
-      averageTranscriptLength: general.averageTranscriptLength ?? 0,
-      averageActionItems: general.averageActionItems ?? 0, // Equivalent to number os tasks
-    },
-    topParticipants: topParticipants.map((item) => ({
-      participant: item.participant,
-      meetingCount: item.meetingCount,
-    })),
-    meetingsByDayOfWeek,
-    tasksStats: {
-      distribution: taskStatusDistribution, // Task count and percentage by status
-    },
-  };
-
+router.get("/stats", async (req: AuthenticatedRequest, res) => {
+  const response = await meetingController.getMyAnalytics(req);
   res.json(response);
 });
 
@@ -85,17 +30,8 @@ router.get(
   "/",
   validate({ query: PaginationDto }),
   async (req: AuthenticatedRequest<any, IPaginationDto>, res) => {
-    const meetings = await meetingRepository.getAllByUserId(req.userId!, {
-      page: req.parsedQuery?.page,
-      limit: req.parsedQuery?.limit,
-    });
-
-    res.json({
-      total: meetings.length,
-      limit: req.parsedQuery!.limit,
-      page: req.parsedQuery!.page,
-      data: meetings,
-    });
+    const response = await meetingController.getMyMeetings(req);
+    res.json(response);
   }
 );
 
@@ -104,19 +40,7 @@ router.get(
   "/:id",
   validate({ params: yupMongoId }),
   async (req: AuthenticatedRequest<IYupMongoId>, res) => {
-    const meeting = await meetingRepository.getById(req.params.id, {
-      userId: req.userId!,
-    });
-
-    if (!meeting) {
-      throw new httpErrors.NotFound();
-    }
-
-    const response = meeting.toJSON();
-    response.tasks = (
-      await taskRepository.getAll({ meetingId: <any>req.params.id })
-    ).map((item) => item.toJSON());
-
+    const response = await meetingController.getMyMeetingById(req);
     res.json(response);
   }
 );
@@ -126,10 +50,8 @@ router.post(
   "/",
   validate({ body: CreateMeetingDto }),
   async (req: AuthenticatedRequest<any, any, ICreateMeetingDto>, res) => {
-    const meeting = new Meeting({ ...req.body, userId: req.userId });
-    const result = await meetingRepository.insert(meeting);
-
-    res.status(201).json(result.toObject({ versionKey: false }));
+    const response = await meetingController.createMyMeeting(req);
+    res.status(201).json(response);
   }
 );
 
@@ -141,16 +63,8 @@ router.put(
     req: AuthenticatedRequest<IYupMongoId, any, IUpdateEndedMeetingDto>,
     res
   ) => {
-    const meeting = await meetingRepository.updateAndGet(
-      { id: req.params.id, userId: req.userId! },
-      { transcript: req.body.transcript, duration: req.body.duration }
-    );
-
-    if (!meeting) {
-      throw new httpErrors.NotFound();
-    }
-
-    res.status(201).json(meeting);
+    const response = await meetingController.updateMyEndedMeeting(req);
+    res.status(201).json(response);
   }
 );
 
@@ -159,35 +73,7 @@ router.post(
   "/:id/summarize",
   validate({ params: yupMongoId }),
   async (req: AuthenticatedRequest, res) => {
-    const meeting = await meetingRepository.getById(req.params.id, {
-      userId: req.userId!,
-    });
-
-    if (!meeting) {
-      throw new httpErrors.NotFound();
-    }
-
-    if (!meeting.transcript) {
-      throw new httpErrors.BadRequest(
-        "The transcription for this meeting is not ready."
-      );
-    }
-
-    const { summary, tasks } = await llm.summarizeMeeting(req.userId!, meeting);
-    meeting.summary = summary;
-    meeting.actionItems = tasks.map(({ title }) => title);
-
-    // TODO Use single mongodb replica to allow transactions
-    await meeting.updateOne({
-      summary: meeting.summary,
-      actionItems: meeting.actionItems,
-    });
-
-    await taskRepository.insertMany(tasks);
-
-    const response = meeting.toObject({ versionKey: false });
-    response.tasks = tasks.map((task) => task.toObject({ versionKey: false }));
-
+    const response = await meetingController.generateMyMeetingSummary(req);
     res.status(201).json(response);
   }
 );

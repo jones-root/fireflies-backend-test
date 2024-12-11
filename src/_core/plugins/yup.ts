@@ -1,4 +1,4 @@
-import { NextFunction, Request, Response } from "express";
+import { NextFunction, Response } from "express";
 import mongoose from "mongoose";
 import Yup from "yup";
 import { AuthenticatedRequest } from "../../user/auth.middleware";

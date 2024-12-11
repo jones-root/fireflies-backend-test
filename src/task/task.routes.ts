@@ -2,7 +2,7 @@ import express from "express";
 import { AuthenticatedRequest } from "../user/auth.middleware.js";
 import { validate } from "../_core/plugins/yup.js";
 import { IPaginationDto, PaginationDto } from "../_core/dto/pagination.dto.js";
-import { taskRepository } from "./task.repository.js";
+import { taskController } from "./task.controller.js";
 
 export const router = express.Router();
 
@@ -12,20 +12,8 @@ router.get(
   "/",
   validate({ query: PaginationDto }),
   async (req: AuthenticatedRequest<any, IPaginationDto>, res) => {
-    const tasks = await taskRepository.getAll(
-      { userId: req.userId! },
-      {
-        page: req.parsedQuery?.page,
-        limit: req.parsedQuery?.limit,
-      }
-    );
-
-    res.json({
-      total: tasks.length,
-      limit: req.parsedQuery!.limit,
-      page: req.parsedQuery!.page,
-      data: tasks,
-    });
+    const response = await taskController.getMyTasks(req);
+    res.json(response);
   }
 );
 

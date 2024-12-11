@@ -1,4 +1,5 @@
 import { IPaginationDto } from "../_core/dto/pagination.dto";
+import { DEFAULT_PAGINATION_LIMIT } from "../constants";
 import { IUpcomingMeeting } from "../dashboard/dto/get_dashboard_response.dto";
 import {
   GeneralAnalytics,
@@ -36,7 +37,10 @@ export const meetingRepository = {
 
   async getAllByUserId(
     userId: string,
-    { page, limit }: IPaginationDto = { page: 1, limit: 36 }
+    { page, limit }: IPaginationDto = {
+      page: 1,
+      limit: DEFAULT_PAGINATION_LIMIT,
+    }
   ) {
     return Meeting.find(
       { userId },

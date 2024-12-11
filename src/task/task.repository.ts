@@ -1,6 +1,7 @@
 import { IPaginationDto } from "../_core/dto/pagination.dto";
 import { ITask, Task, TaskStatus } from "./task.model";
 import { IOverdueTask } from "../dashboard/dto/get_dashboard_response.dto";
+import { DEFAULT_PAGINATION_LIMIT } from "../constants";
 
 export interface ITaskStatusCount {
   status: TaskStatus;
@@ -14,7 +15,10 @@ export const taskRepository = {
 
   async getAll(
     { id, ...criteria }: Partial<Pick<ITask, "id" | "userId" | "meetingId">>,
-    { page, limit }: IPaginationDto = { page: 1, limit: 36 }
+    { page, limit }: IPaginationDto = {
+      page: 1,
+      limit: DEFAULT_PAGINATION_LIMIT,
+    }
   ) {
     return Task.find(
       { _id: id, ...criteria },
