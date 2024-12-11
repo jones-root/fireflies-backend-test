@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction } from "express";
+import httpErrors from "http-errors";
 
 export interface AuthenticatedRequest<
   Params extends Record<string, any> = any,
@@ -18,8 +19,7 @@ export const authMiddleware = (
 ): void => {
   const userId = req.header("x-user-id");
   if (!userId) {
-    res.status(401).json({ message: "Authentication required" });
-    return;
+    throw new httpErrors.Unauthorized();
   }
   req.userId = userId;
   next();

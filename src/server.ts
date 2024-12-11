@@ -1,7 +1,9 @@
-// env vars must be loaded from a separate module because in ESModules modules are loaded and executed before any of the importing module code
+// Env vars must be loaded from a separate module because in ESModules modules are loaded and executed before any of the importing module code
 import "./_core/plugins/env.config.js";
 
+// Directly calls next() on async errors preventing the need for manual try/catch
 import "express-async-errors";
+
 import express from "express";
 import { meetingRoutes } from "./meeting/meetings.routes.js";
 import { taskRoutes } from "./task/task.router.js";

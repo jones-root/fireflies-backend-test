@@ -4,6 +4,7 @@ import mongoose from "mongoose";
 import { Meeting, IMeeting } from "./meeting/meeting.model.js";
 import { Task, ITask } from "./task/task.model.js";
 import { connectToMongoDB } from "./_core/plugins/mongo.config.js";
+import { futureDate, randomDate, randomNumber } from "./_core/utils/index.js";
 
 await connectToMongoDB({ isForSeeding: true });
 
@@ -21,14 +22,8 @@ const participants = [
   "Jack",
 ];
 
-function randomDate(start: Date, end: Date): Date {
-  return new Date(
-    start.getTime() + Math.random() * (end.getTime() - start.getTime())
-  );
-}
-
 function randomParticipants(): string[] {
-  const count = Math.floor(Math.random() * 5) + 2; // 2 to 6 participants
+  const count = randomNumber(2, 6);
   return participants.sort(() => 0.5 - Math.random()).slice(0, count);
 }
 
@@ -38,7 +33,7 @@ async function seedMeetings() {
   const meetings: IMeeting[] = [];
 
   for (let i = 0; i < 100; i++) {
-    const userId = users[Math.floor(Math.random() * users.length)];
+    const userId = users[randomNumber(0, users.length - 1)];
     const meeting = new Meeting({
       userId: userId,
       title: `Meeting ${i + 1}`,
@@ -65,7 +60,7 @@ async function seedTasks() {
   const tasks: ITask[] = [];
 
   for (const meeting of meetings) {
-    const taskCount = Math.floor(Math.random() * 3) + 1; // 1 to 3 tasks per meeting
+    const taskCount = randomNumber(1, 3);
     for (let i = 0; i < taskCount; i++) {
       const task = new Task({
         meetingId: meeting._id,
@@ -73,11 +68,9 @@ async function seedTasks() {
         title: `Task ${i + 1} from ${meeting.title}`,
         description: `This is a sample task from meeting ${meeting.title}`,
         status: ["pending", "in-progress", "completed"][
-          Math.floor(Math.random() * 3)
+          Math.floor(randomNumber(0, 2))
         ],
-        dueDate: new Date(
-          meeting.date.getTime() + Math.random() * 7 * 24 * 60 * 60 * 1000
-        ), // Random date within a week of the meeting
+        dueDate: futureDate(new Date(), 7), // Random date within a week of the meeting
       });
       tasks.push(task);
     }
