@@ -8,11 +8,7 @@ export interface ITask extends Document {
   /** Related meeting ID */
   meetingId: mongoose.Types.ObjectId;
 
-  /**
-   * Owner of the related meeting.
-   *
-   * TODO: Allow to distribute/attach tasks to participants.
-   */
+  /** Owner of the related meeting. */
   userId: string;
 
   /** Title of the task */

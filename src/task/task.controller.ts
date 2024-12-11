@@ -18,8 +18,8 @@ export const taskController = {
 
     return {
       total: tasks.length,
-      limit: req.parsedQuery!.limit ?? DEFAULT_PAGINATION_LIMIT,
-      page: req.parsedQuery!.page ?? 1,
+      limit: req.parsedQuery?.limit ?? DEFAULT_PAGINATION_LIMIT,
+      page: req.parsedQuery?.page ?? 1,
       data: tasks,
     };
   },
