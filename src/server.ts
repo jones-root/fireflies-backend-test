@@ -23,8 +23,8 @@ app.get("/api", (req, res) => {
   res.json({ message: "Welcome to the MeetingBot API" });
 });
 
-app.use("/api/meeting", authMiddleware, meetingRoutes);
-app.use("/api/task", authMiddleware, taskRoutes);
+app.use("/api/meetings", authMiddleware, meetingRoutes);
+app.use("/api/tasks", authMiddleware, taskRoutes);
 app.use("/api/dashboard", authMiddleware, dashboardRoutes);
 
 // Global error handler

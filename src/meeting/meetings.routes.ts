@@ -84,15 +84,10 @@ router.get(
   "/",
   validate({ query: PaginationDto }),
   async (req: AuthenticatedRequest<any, IPaginationDto>, res) => {
-    const meetings = await Meeting.find(
-      { userId: req.userId },
-      { __v: 0 },
-      {
-        sort: { date: -1 },
-        skip: (req.parsedQuery!.page! - 1) * req.parsedQuery!.limit!,
-        limit: req.parsedQuery!.limit,
-      }
-    );
+    const meetings = await meetingRepository.getAllByUserId(req.userId!, {
+      page: req.parsedQuery?.page,
+      limit: req.parsedQuery?.limit,
+    });
 
     res.json({
       total: meetings.length,
@@ -108,10 +103,9 @@ router.get(
   "/:id",
   validate({ params: yupMongoId }),
   async (req: AuthenticatedRequest<IYupMongoId>, res) => {
-    const meeting = await Meeting.findOne(
-      { _id: req.params.id, userId: req.userId },
-      { __v: 0 }
-    );
+    const meeting = await meetingRepository.getById(req.params.id, {
+      userId: req.userId!,
+    });
 
     if (!meeting) {
       throw new httpErrors.NotFound();
@@ -144,12 +138,9 @@ router.put(
     req: AuthenticatedRequest<IYupMongoId, any, IUpdateEndedMeetingDto>,
     res
   ) => {
-    const meeting = await Meeting.findOneAndUpdate(
-      { _id: req.params.id, userId: req.userId },
-      {
-        $set: { transcript: req.body.transcript, duration: req.body.duration },
-      },
-      { new: true }
+    const meeting = await meetingRepository.updateAndGet(
+      { id: req.params.id, userId: req.userId! },
+      { transcript: req.body.transcript, duration: req.body.duration }
     );
 
     if (!meeting) {
@@ -165,9 +156,8 @@ router.post(
   "/:id/summarize",
   validate({ params: yupMongoId }),
   async (req: AuthenticatedRequest, res) => {
-    const meeting = await Meeting.findOne({
-      _id: req.params.id,
-      userId: req.userId,
+    const meeting = await meetingRepository.getById(req.params.id, {
+      userId: req.userId!,
     });
 
     if (!meeting) {
@@ -192,7 +182,7 @@ router.post(
 
     await Task.insertMany(tasks);
 
-    const response = meeting.toObject({ versionKey: false }).toJSON();
+    const response = meeting.toObject({ versionKey: false });
     response.tasks = tasks.map((task) => task.toObject({ versionKey: false }));
 
     res.status(201).json(response);

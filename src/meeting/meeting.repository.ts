@@ -1,6 +1,43 @@
-import { Meeting } from "./meeting.model";
+import { IPaginationDto } from "../_core/dto/pagination.dto";
+import { IMeeting, Meeting } from "./meeting.model";
 
 export const meetingRepository = {
+  async updateAndGet(
+    { id, ...criteria }: Partial<Pick<IMeeting, "id" | "userId">>,
+    partial: Partial<IMeeting>
+  ) {
+    const meeting = await Meeting.findOneAndUpdate(
+      { _id: id, ...criteria },
+      { $set: partial },
+      { new: true }
+    );
+
+    if (meeting) {
+      return meeting.toObject({ versionKey: false });
+    }
+
+    return meeting;
+  },
+
+  async getById(id: string, options?: { userId?: string }) {
+    return Meeting.findOne({ _id: id, userId: options?.userId }, { __v: 0 });
+  },
+
+  async getAllByUserId(
+    userId: string,
+    { page, limit }: IPaginationDto = { page: 1, limit: 36 }
+  ) {
+    return Meeting.find(
+      { userId },
+      { __v: 0 },
+      {
+        sort: { date: -1 },
+        skip: (page! - 1) * limit!,
+        limit: limit,
+      }
+    );
+  },
+
   async getAnalyticsByUserId(userId: string) {
     const [meetingsResult] = await Meeting.aggregate([
       {

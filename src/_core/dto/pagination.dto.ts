@@ -3,11 +3,11 @@ import Yup from "yup";
 export const PaginationDto = Yup.object({
   page: Yup.number() //
     .integer()
-    .required()
+    .optional()
     .min(1),
   limit: Yup.number() //
     .integer()
-    .required()
+    .optional()
     .min(1)
     .max(100),
 });
