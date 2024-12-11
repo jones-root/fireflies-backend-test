@@ -17,6 +17,9 @@ COPY . .
 
 COPY --from=builder /usr/app/dist ./dist
 
+# Create .env from .env.template if .env does not exist already
+RUN [ ! -f .env ] && cp .env.template .env || true
+
 ENV TZ UTC
 
 # Start app

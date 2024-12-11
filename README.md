@@ -16,7 +16,7 @@
 - To start **without docker**:
 
 	Setup a MongoDB connection via the variables in your `.env` and then run `npm run start:dev`.
-- You can run optionally `npm run seed` to seed the database with mocked data.
+- You can run optionally run `npm run seed` to seed the database with mocked data.
 
 ### Testing
 
