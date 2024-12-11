@@ -1,16 +1,16 @@
 import httpErrors from "http-errors";
-import { IMeeting, Meeting } from "./meeting.model.js";
-import { llm } from "../_core/plugins/llm.js";
-import { meetingRepository } from "./meeting.repository.js";
-import { taskRepository } from "../task/task.repository.js";
-import { GetAnalyticsResponseDto } from "./dto/get_analytics_response.dto.js";
-import { DEFAULT_PAGINATION_LIMIT } from "../constants.js";
-import { IPaginationResponseDto } from "../_core/dto/pagination_response.dto.js";
-import { AuthenticatedRequest } from "../user/auth.middleware.js";
-import { IPaginationDto } from "../_core/dto/pagination.dto.js";
-import { IYupMongoId } from "../_core/plugins/yup.js";
-import { IUpdateEndedMeetingDto } from "./dto/update_ended_meeting.dto.js";
-import { ICreateMeetingDto } from "./dto/create_meeting.dto.js";
+import { IMeeting, Meeting } from "./meeting.model";
+import { llm } from "../_core/plugins/llm";
+import { meetingRepository } from "./meeting.repository";
+import { taskRepository } from "../task/task.repository";
+import { GetAnalyticsResponseDto } from "./dto/get_analytics_response.dto";
+import { DEFAULT_PAGINATION_LIMIT } from "../constants";
+import { IPaginationResponseDto } from "../_core/dto/pagination_response.dto";
+import { AuthenticatedRequest } from "../user/auth.middleware";
+import { IPaginationDto } from "../_core/dto/pagination.dto";
+import { IYupMongoId } from "../_core/plugins/yup";
+import { IUpdateEndedMeetingDto } from "./dto/update_ended_meeting.dto";
+import { ICreateMeetingDto } from "./dto/create_meeting.dto";
 
 export const meetingController = {
   async getMyAnalytics(

@@ -1,8 +1,8 @@
 import express from "express";
-import { AuthenticatedRequest } from "../user/auth.middleware.js";
-import { validate } from "../_core/plugins/yup.js";
-import { IPaginationDto, PaginationDto } from "../_core/dto/pagination.dto.js";
-import { taskController } from "./task.controller.js";
+import { AuthenticatedRequest } from "../user/auth.middleware";
+import { validate } from "../_core/plugins/yup";
+import { IPaginationDto, PaginationDto } from "../_core/dto/pagination.dto";
+import { taskController } from "./task.controller";
 
 export const router = express.Router();
 

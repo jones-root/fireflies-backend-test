@@ -17,7 +17,6 @@ const config = {
     "^.+.tsx?$": ["ts-jest", { tsconfig: "tsconfig.json", useESM: true }],
   },
   moduleNameMapper: {
-    //   "(.+)\\.js": "$1",
     "^(\\.{1,2}/.*)\\.js$": "$1",
   },
 
