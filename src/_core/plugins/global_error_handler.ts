@@ -5,6 +5,7 @@ const defaultMessagePerError = {
   [httpErrors.NotFound.name]: new httpErrors.NotFound().message,
   [httpErrors.BadRequest.name]: new httpErrors.BadRequest().message,
   [httpErrors.Unauthorized.name]: new httpErrors.Unauthorized().message,
+  [httpErrors.Forbidden.name]: new httpErrors.Forbidden().message,
 };
 
 // For user-targeted specific error messages, the error must be handled in the endpoint or throw an identifiable key to be handled here
@@ -27,6 +28,13 @@ export const globalErrorHandler = (
   } else if (error instanceof httpErrors.Unauthorized) {
     res.status(error.status).json({
       message: hasCustomMessage ? error.message : "Authentication required.",
+    });
+    return;
+  } else if (error instanceof httpErrors.Forbidden) {
+    res.status(error.status).json({
+      message: hasCustomMessage
+        ? error.message
+        : "No permission to access resource.",
     });
     return;
   } else if (error instanceof httpErrors.BadRequest) {
