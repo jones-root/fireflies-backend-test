@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import mongoose from "mongoose";
 import Yup from "yup";
+import { AuthenticatedRequest } from "../../user/auth.middleware";
 
 export interface IEndpointSchema {
   body?: Yup.Schema;
@@ -16,10 +17,20 @@ const options: Yup.ValidateOptions<any> = {
 };
 
 export function validate({ params, query, body }: IEndpointSchema) {
-  return async (req: Request, res: Response, next: NextFunction) => {
+  return async (
+    req: AuthenticatedRequest,
+    res: Response,
+    next: NextFunction
+  ) => {
     try {
+      if (req.query.json && typeof req.query.json === "string") {
+        req.parsedQuery = JSON.parse(req.query.json);
+      }
+
       req.params = (await params?.validate(req.params, options)) ?? req.params;
-      req.query = (await query?.validate(req.query, options)) ?? req.query;
+      req.parsedQuery =
+        (await query?.validate(req.parsedQuery ?? req.query, options)) ??
+        req.query;
       req.body = (await body?.validate(req.body, options)) ?? req.body;
       next();
     } catch (error: any) {

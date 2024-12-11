@@ -13,20 +13,34 @@ import {
 } from "./dto/set_meeting_transcription.dto.js";
 import { llm } from "../_core/plugins/llm.js";
 import { Task } from "../task/task.model.js";
+import { GetMeetingsDto, IGetMeetingsDto } from "./dto/get_meetings.dto.js";
 
 export const router = express.Router();
 
-// GET all meetings for user
-router.get("/", async (req: AuthenticatedRequest, res) => {
-  const meetings = await Meeting.find({ userId: req.userId }, { __v: 0 });
+// GET all meetings for requesting user
+// The query should be in the format ?json={"limit":0,"page":0}
+router.get(
+  "/",
+  validate({ query: GetMeetingsDto }),
+  async (req: AuthenticatedRequest<any, IGetMeetingsDto>, res) => {
+    const meetings = await Meeting.find(
+      { userId: req.userId },
+      { __v: 0 },
+      {
+        sort: { date: -1 },
+        skip: (req.parsedQuery!.page! - 1) * req.parsedQuery!.limit!,
+        limit: req.parsedQuery!.limit,
+      }
+    );
 
-  res.json({
-    total: meetings.length,
-    limit: req.query.limit,
-    page: req.query.page,
-    data: meetings,
-  });
-});
+    res.json({
+      total: meetings.length,
+      limit: req.parsedQuery!.limit,
+      page: req.parsedQuery!.page,
+      data: meetings,
+    });
+  }
+);
 
 // POST create a meeting
 router.post(
@@ -62,7 +76,7 @@ router.put(
   }
 );
 
-// Generate summary, action items and tasks for a meeting
+// POST Generate summary, action items and tasks for a meeting
 router.post(
   "/:id/summarize",
   validate({ params: yupMongoId }),

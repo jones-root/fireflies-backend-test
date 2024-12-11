@@ -8,8 +8,8 @@ export interface AuthenticatedRequest<
 > extends Request {
   userId?: string;
   params: Params;
-  query: Query;
   body: Body;
+  parsedQuery?: Query;
 }
 
 export const authMiddleware = (
