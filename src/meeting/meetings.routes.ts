@@ -13,7 +13,7 @@ import {
 } from "./dto/set_meeting_transcription.dto.js";
 import { llm } from "../_core/plugins/llm.js";
 import { Task } from "../task/task.model.js";
-import { GetMeetingsDto, IGetMeetingsDto } from "./dto/get_meetings.dto.js";
+import { IPaginationDto, PaginationDto } from "../_core/dto/pagination.dto.js";
 
 export const router = express.Router();
 
@@ -21,8 +21,8 @@ export const router = express.Router();
 // The query should be in the format ?json={"limit":0,"page":0}
 router.get(
   "/",
-  validate({ query: GetMeetingsDto }),
-  async (req: AuthenticatedRequest<any, IGetMeetingsDto>, res) => {
+  validate({ query: PaginationDto }),
+  async (req: AuthenticatedRequest<any, IPaginationDto>, res) => {
     const meetings = await Meeting.find(
       { userId: req.userId },
       { __v: 0 },
@@ -42,6 +42,7 @@ router.get(
   }
 );
 
+// GET Retrieve single meeting
 router.get(
   "/:id",
   validate({ params: yupMongoId }),

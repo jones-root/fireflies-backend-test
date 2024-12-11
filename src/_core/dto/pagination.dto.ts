@@ -1,6 +1,6 @@
 import Yup from "yup";
 
-export const GetMeetingsDto = Yup.object({
+export const PaginationDto = Yup.object({
   page: Yup.number() //
     .integer()
     .required()
@@ -12,4 +12,4 @@ export const GetMeetingsDto = Yup.object({
     .max(100),
 });
 
-export type IGetMeetingsDto = Yup.InferType<typeof GetMeetingsDto>;
+export type IPaginationDto = Yup.InferType<typeof PaginationDto>;
