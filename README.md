@@ -1,4 +1,32 @@
-# Fireflies.ai backend test
+# Instructions
+
+### Prerequisites
+
+- Node v22
+- Docker _(optional)_
+
+### How to run locally?
+
+- Create a `.env` file from the `.env.template`.
+- Run `npm install`
+- Run `npm run start:docker` to spin up a standalone MongoDB container and the api container.
+	
+	If you don't have docker, you should setup a MongoDB connection via the variables in your `.env` and then run `npm run start:dev`.
+- You can run optionally `npm run seed` to seed the database with mocked data.
+
+### Testing
+
+- Run `npm run test` ro execute unit tests.
+
+### Build
+
+- Run `npm run build` and `npm run start` to test the build version locally.
+
+	You can also build and image of the container based on the `Dockerfile`.
+
+---
+
+# Original description - Fireflies.ai backend test
 
 This project looks awful, somebody really messed it up. Can you help us fix it?
 
