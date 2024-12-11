@@ -16,6 +16,7 @@ import { Task } from "../task/task.model.js";
 import { IPaginationDto, PaginationDto } from "../_core/dto/pagination.dto.js";
 import { meetingRepository } from "./meeting.repository.js";
 import { taskRepository } from "../task/task.repository.js";
+import { GetAnalyticsResponseDto } from "./dto/get_analytics_response.dto.js";
 
 export const router = express.Router();
 
@@ -36,24 +37,24 @@ router.get("/stats", async (req: AuthenticatedRequest, res, next) => {
   const participantDiversity = distinctParticipants?.length ?? 0;
 
   const meetingsByDayOfWeek = days
-    .map((item: any) => ({
+    .map((item) => ({
       dayOfWeek: item.dayOfWeek, // 1 - Sunday ... 7 - Saturday
       count: item.count,
     }))
-    .sort((left: any, right: any) => left.dayOfWeek - right.dayOfWeek);
+    .sort((left, right) => left.dayOfWeek - right.dayOfWeek);
 
   const totalTasks = tasksDistribution.reduce(
-    (total: number, current: any) => total + current.count,
+    (total: number, current) => total + current.count,
     0
   );
 
-  const taskStatusDistribution = tasksDistribution.map((item: any) => ({
+  const taskStatusDistribution = tasksDistribution.map((item) => ({
     status: item.status,
     count: item.count,
     percentage: item.count / totalTasks,
   }));
 
-  const response = {
+  const response: GetAnalyticsResponseDto = {
     generalStats: {
       totalMeetings: general.totalMeetings ?? 0,
       averageParticipants: general.averageParticipants ?? 0,
@@ -63,15 +64,15 @@ router.get("/stats", async (req: AuthenticatedRequest, res, next) => {
       longestMeeting: general.longestMeeting ?? 0,
       averageDuration: general.averageDuration ?? 0,
       averageTranscriptLength: general.averageTranscriptLength ?? 0,
-      averageActionItems: general.averageActionItems ?? 0, // Equivalent to total number os tasks
+      averageActionItems: general.averageActionItems ?? 0, // Equivalent to number os tasks
     },
-    topParticipants: topParticipants.map((item: any) => ({
-      participant: item.name,
+    topParticipants: topParticipants.map((item) => ({
+      participant: item.participant,
       meetingCount: item.meetingCount,
     })),
     meetingsByDayOfWeek,
     tasksStats: {
-      distribution: taskStatusDistribution, // Count of tasks with a specific status
+      distribution: taskStatusDistribution, // Task count and percentage by status
     },
   };
 
@@ -188,7 +189,5 @@ router.post(
     res.status(201).json(response);
   }
 );
-
-export default router;
 
 export { router as meetingRoutes };

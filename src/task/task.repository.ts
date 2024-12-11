@@ -1,5 +1,11 @@
 import { IPaginationDto } from "../_core/dto/pagination.dto";
-import { Task } from "./task.model";
+import { Task, TaskStatus } from "./task.model";
+import { IOverdueTask } from "../dashboard/dto/get_dashboard_response.dto";
+
+export interface ITaskStatusCount {
+  status: TaskStatus;
+  count: number;
+}
 
 export const taskRepository = {
   async getAllByUserId(
@@ -17,7 +23,10 @@ export const taskRepository = {
     );
   },
 
-  async getDashboardByUserId(userId: string) {
+  async getDashboardByUserId(userId: string): Promise<{
+    tasksDistribution?: ITaskStatusCount[];
+    overdueTasks?: IOverdueTask[];
+  }> {
     const now = new Date();
 
     const [result] = await Task.aggregate([
@@ -46,7 +55,7 @@ export const taskRepository = {
                 title: 1,
                 dueDate: 1,
                 meetingId: 1,
-                meetingTitle: { $arrayElemAt: ["$meeting.title", 0] },
+                meetingTitle: { $arrayElemAt: ["$meeting.title", 0] }, // It should always return 1 meeting from $lookup
               },
             },
           ],
@@ -57,7 +66,9 @@ export const taskRepository = {
     return result;
   },
 
-  async getAnalyticsByUserId(userId: string) {
+  async getAnalyticsByUserId(
+    userId: string
+  ): Promise<{ tasksDistribution?: ITaskStatusCount[] }> {
     const [result] = await Task.aggregate([
       { $match: { userId } },
       { $facet: { tasksDistribution: this._tasksDistributionAggregation } },
@@ -66,6 +77,7 @@ export const taskRepository = {
     return result;
   },
 
+  /** Reusable MongoDB aggregation to retrieve distribution of tasks  */
   get _tasksDistributionAggregation() {
     return [
       {

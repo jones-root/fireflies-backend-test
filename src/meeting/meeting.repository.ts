@@ -1,4 +1,10 @@
 import { IPaginationDto } from "../_core/dto/pagination.dto";
+import { IUpcomingMeeting } from "../dashboard/dto/get_dashboard_response.dto";
+import {
+  GeneralAnalytics,
+  MeetingsByTheOfWeek,
+  TopParticipant,
+} from "./dto/get_analytics_response.dto";
 import { IMeeting, Meeting } from "./meeting.model";
 
 export const meetingRepository = {
@@ -39,7 +45,10 @@ export const meetingRepository = {
     );
   },
 
-  async getDashboardByUserId(userId: string) {
+  async getDashboardByUserId(userId: string): Promise<{
+    totalMeetings?: { count: number }[];
+    upcomingMeetings?: IUpcomingMeeting[];
+  }> {
     const now = new Date();
     const [result] = await Meeting.aggregate([
       { $match: { userId } },
@@ -66,7 +75,14 @@ export const meetingRepository = {
     return result;
   },
 
-  async getAnalyticsByUserId(userId: string) {
+  async getAnalyticsByUserId(userId: string): Promise<{
+    generalStats?: Partial<GeneralAnalytics>[];
+    topParticipants?: TopParticipant[];
+    meetingsByDayOfWeek?: MeetingsByTheOfWeek[];
+    distinctParticipants?: {
+      distinctParticipants?: any[];
+    }[];
+  }> {
     const [result] = await Meeting.aggregate([
       { $match: { userId } },
       {
@@ -108,7 +124,7 @@ export const meetingRepository = {
                 meetingCount: { $sum: 1 },
               },
             },
-            { $project: { name: "$_id", meetingCount: 1 } },
+            { $project: { participant: "$_id", meetingCount: 1 } },
             { $sort: { meetingCount: -1 } },
             { $limit: 5 },
           ],

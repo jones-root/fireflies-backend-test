@@ -1,5 +1,7 @@
 import mongoose, { Document, Schema } from "mongoose";
 
+export type TaskStatus = "pending" | "in-progress" | "completed";
+
 export interface ITask extends Document {
   _id: mongoose.Types.ObjectId;
 
@@ -20,7 +22,7 @@ export interface ITask extends Document {
   description: string;
 
   /** Status */
-  status: "pending" | "in-progress" | "completed";
+  status: TaskStatus;
 
   /** Due date */
   dueDate: Date;

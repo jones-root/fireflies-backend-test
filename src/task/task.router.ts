@@ -7,6 +7,7 @@ import { taskRepository } from "./task.repository.js";
 export const router = express.Router();
 
 // GET all tasks from requesting user
+// The query should be in the format ?json={"limit":0,"page":0}
 router.get(
   "/",
   validate({ query: PaginationDto }),
