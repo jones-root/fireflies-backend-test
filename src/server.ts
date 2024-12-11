@@ -6,7 +6,7 @@ import "express-async-errors";
 
 import express from "express";
 import { meetingRoutes } from "./meeting/meetings.routes.js";
-import { taskRoutes } from "./task/task.router.js";
+import { taskRoutes } from "./task/task.routes.js";
 import { dashboardRoutes } from "./dashboard/dashboard.routes.js";
 import { authMiddleware } from "./user/auth.middleware.js";
 import { connectToMongoDB } from "./_core/plugins/mongo.config.js";

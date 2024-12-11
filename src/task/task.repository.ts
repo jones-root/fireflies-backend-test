@@ -1,5 +1,5 @@
 import { IPaginationDto } from "../_core/dto/pagination.dto";
-import { Task, TaskStatus } from "./task.model";
+import { ITask, Task, TaskStatus } from "./task.model";
 import { IOverdueTask } from "../dashboard/dto/get_dashboard_response.dto";
 
 export interface ITaskStatusCount {
@@ -8,12 +8,16 @@ export interface ITaskStatusCount {
 }
 
 export const taskRepository = {
-  async getAllByUserId(
-    userId: string,
+  async insertMany(tasks: ITask[]) {
+    return Task.insertMany(tasks);
+  },
+
+  async getAll(
+    { id, ...criteria }: Partial<Pick<ITask, "id" | "userId" | "meetingId">>,
     { page, limit }: IPaginationDto = { page: 1, limit: 36 }
   ) {
     return Task.find(
-      { userId },
+      { _id: id, ...criteria },
       { __v: 0 },
       {
         sort: { date: -1 },

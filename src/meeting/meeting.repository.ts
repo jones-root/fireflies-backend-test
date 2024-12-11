@@ -8,6 +8,10 @@ import {
 import { IMeeting, Meeting } from "./meeting.model";
 
 export const meetingRepository = {
+  async insert(meeting: IMeeting) {
+    return Meeting.create(meeting);
+  },
+
   /** It's mapped to `findAndModify` in MongoDB. Only 1 query is performed. */
   async updateAndGet(
     { id, ...criteria }: Partial<Pick<IMeeting, "id" | "userId">>,

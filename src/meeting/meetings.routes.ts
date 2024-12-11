@@ -113,7 +113,9 @@ router.get(
     }
 
     const response = meeting.toJSON();
-    response.tasks = await Task.find({ meetingId: req.params.id }, { __v: 0 });
+    response.tasks = (
+      await taskRepository.getAll({ meetingId: <any>req.params.id })
+    ).map((item) => item.toJSON());
 
     res.json(response);
   }
@@ -125,7 +127,7 @@ router.post(
   validate({ body: CreateMeetingDto }),
   async (req: AuthenticatedRequest<any, any, ICreateMeetingDto>, res) => {
     const meeting = new Meeting({ ...req.body, userId: req.userId });
-    const result = await Meeting.create(meeting);
+    const result = await meetingRepository.insert(meeting);
 
     res.status(201).json(result.toObject({ versionKey: false }));
   }
@@ -181,7 +183,7 @@ router.post(
       actionItems: meeting.actionItems,
     });
 
-    await Task.insertMany(tasks);
+    await taskRepository.insertMany(tasks);
 
     const response = meeting.toObject({ versionKey: false });
     response.tasks = tasks.map((task) => task.toObject({ versionKey: false }));
