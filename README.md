@@ -24,6 +24,10 @@
 
 	You can also build and image of the container based on the `Dockerfile`.
 
+### Formatting
+
+- Keep consistent formatting with prettier extension. You can also format via terminal with `npm run format`.
+
 ---
 
 # Original description - Fireflies.ai backend test

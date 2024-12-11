@@ -4,10 +4,7 @@ import { AuthenticatedRequest } from "../user/auth.middleware";
 import { IYupMongoId, validate, yupMongoId } from "../_core/plugins/yup";
 import { CreateMeetingDto, ICreateMeetingDto } from "./dto/create_meeting.dto";
 
-import {
-  IUpdateEndedMeetingDto,
-  UpdateEndedMeetingDto,
-} from "./dto/update_ended_meeting.dto";
+import { IUpdateEndedMeetingDto, UpdateEndedMeetingDto } from "./dto/update_ended_meeting.dto";
 
 import { IPaginationDto, PaginationDto } from "../_core/dto/pagination.dto";
 
@@ -17,62 +14,47 @@ export const router = express.Router();
 
 // GET return statistics about meetings
 router.get("/stats", async (req: AuthenticatedRequest, res) => {
-  const response = await meetingController.getMyAnalytics(req);
-  res.json(response);
+	const response = await meetingController.getMyAnalytics(req);
+	res.json(response);
 });
 
 // GET all meetings for requesting user
 // The query should be in the format ?json={"limit":0,"page":0}
-router.get(
-  "/",
-  validate({ query: PaginationDto }),
-  async (req: AuthenticatedRequest<any, IPaginationDto>, res) => {
-    const response = await meetingController.getMyMeetings(req);
-    res.json(response);
-  }
-);
+router.get("/", validate({ query: PaginationDto }), async (req: AuthenticatedRequest<any, IPaginationDto>, res) => {
+	const response = await meetingController.getMyMeetings(req);
+	res.json(response);
+});
 
 // GET Retrieve single meeting
-router.get(
-  "/:id",
-  validate({ params: yupMongoId }),
-  async (req: AuthenticatedRequest<IYupMongoId>, res) => {
-    const response = await meetingController.getMyMeetingById(req);
-    res.json(response);
-  }
-);
+router.get("/:id", validate({ params: yupMongoId }), async (req: AuthenticatedRequest<IYupMongoId>, res) => {
+	const response = await meetingController.getMyMeetingById(req);
+	res.json(response);
+});
 
 // POST create a meeting
 router.post(
-  "/",
-  validate({ body: CreateMeetingDto }),
-  async (req: AuthenticatedRequest<any, any, ICreateMeetingDto>, res) => {
-    const response = await meetingController.createMyMeeting(req);
-    res.status(201).json(response);
-  }
+	"/",
+	validate({ body: CreateMeetingDto }),
+	async (req: AuthenticatedRequest<any, any, ICreateMeetingDto>, res) => {
+		const response = await meetingController.createMyMeeting(req);
+		res.status(201).json(response);
+	},
 );
 
 // PUT Update a meeting with its transcript.
 router.put(
-  "/:id/transcript",
-  validate({ params: yupMongoId, body: UpdateEndedMeetingDto }),
-  async (
-    req: AuthenticatedRequest<IYupMongoId, any, IUpdateEndedMeetingDto>,
-    res
-  ) => {
-    const response = await meetingController.updateMyEndedMeeting(req);
-    res.status(201).json(response);
-  }
+	"/:id/transcript",
+	validate({ params: yupMongoId, body: UpdateEndedMeetingDto }),
+	async (req: AuthenticatedRequest<IYupMongoId, any, IUpdateEndedMeetingDto>, res) => {
+		const response = await meetingController.updateMyEndedMeeting(req);
+		res.status(201).json(response);
+	},
 );
 
 // POST Generate summary, action items and tasks for a meeting
-router.post(
-  "/:id/summarize",
-  validate({ params: yupMongoId }),
-  async (req: AuthenticatedRequest, res) => {
-    const response = await meetingController.generateMyMeetingSummary(req);
-    res.status(201).json(response);
-  }
-);
+router.post("/:id/summarize", validate({ params: yupMongoId }), async (req: AuthenticatedRequest, res) => {
+	const response = await meetingController.generateMyMeetingSummary(req);
+	res.status(201).json(response);
+});
 
 export { router as meetingRoutes };

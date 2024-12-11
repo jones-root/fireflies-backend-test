@@ -1,6 +1,6 @@
 export interface IPaginationResponseDto<T = any[]> {
-  total: number;
-  limit: number;
-  page: number;
-  data: T;
+	total: number;
+	limit: number;
+	page: number;
+	data: T;
 }

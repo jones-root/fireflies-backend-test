@@ -26,22 +26,22 @@ app.use(express.json());
 // Enable CORS
 const corsWhitelist = process.env.CORS_WHITELIST?.split(",") ?? [];
 const corsOptions: CorsOptions = {
-  origin: (origin, callback) => {
-    // Allow requests without origin during development
-    if ((IS_DEV && !origin) || corsWhitelist.includes(origin!)) {
-      callback(null, true);
-    } else {
-      callback(new httpErrors.Forbidden("Not allowed by CORS"));
-    }
-  },
-  maxAge: 1800, // Keep preflight info for 30 mins
-  credentials: true,
+	origin: (origin, callback) => {
+		// Allow requests without origin during development
+		if ((IS_DEV && !origin) || corsWhitelist.includes(origin!)) {
+			callback(null, true);
+		} else {
+			callback(new httpErrors.Forbidden("Not allowed by CORS"));
+		}
+	},
+	maxAge: 1800, // Keep preflight info for 30 mins
+	credentials: true,
 };
 
 app.use(cors(corsOptions));
 
 app.get("/api", (req, res) => {
-  res.json({ message: "Welcome to the MeetingBot API" });
+	res.json({ message: "Welcome to the MeetingBot API" });
 });
 
 app.use("/api/meetings", authMiddleware, meetingRoutes);
@@ -53,5 +53,5 @@ app.use(globalErrorHandler);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+	console.log(`Server is running on port ${PORT}`);
 });
