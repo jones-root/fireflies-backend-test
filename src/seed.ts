@@ -6,7 +6,7 @@ import { Task, ITask } from "./task/task.model.js";
 import { connectToMongoDB } from "./_core/plugins/mongo.config.js";
 import { futureDate, randomDate, randomNumber } from "./_core/utils/index.js";
 
-await connectToMongoDB({ isForSeeding: true });
+await connectToMongoDB();
 
 const users = ["user1", "user2", "user3", "user4", "user5"];
 const participants = ["Alice", "Bob", "Charlie", "David", "Eva", "Frank", "Grace", "Henry", "Ivy", "Jack"];

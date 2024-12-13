@@ -16,7 +16,16 @@
 - To start **without docker**:
 
 	Setup a MongoDB connection via the variables in your `.env` and then run `npm run start:dev`.
-- You can run optionally run `npm run seed` to seed the database with mocked data.
+
+### Seeding the database
+
+- To seed when the app was **started with** _`npm run start:docker`_ and the **api is connected to the local mongo container** _(default configuration)_:
+
+	Run `npm run seed:local`. This script will change the env var from `MONGO_HOST=mongo:27017` to `MONGO_HOST=127.0.0.1:27017` where the instance is accessible.
+
+- To seed in any other case:
+
+	Run `npm run seed`.
 
 ### Testing
 
