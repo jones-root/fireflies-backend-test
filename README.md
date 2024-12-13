@@ -38,6 +38,17 @@
 
 - Keep consistent formatting with prettier extension. You can also format via terminal with `npm run format`.
 
+## Improvements out of current scope
+
+- [ ] Rate limiter
+- [ ] Coverage for unit testing
+- [ ] HTTP/2
+- [ ] Linter
+- [ ] Husky to perform formatting/linting on commits automatically
+- [ ] Proper user authentication with hashed password
+- [ ] Restructure `Meeting.participants` to be instances of a new `User` schema
+- [ ] Spin up MongoDB container in replica mode to enable transitioning
+
 ---
 
 # Original description - Fireflies.ai backend test

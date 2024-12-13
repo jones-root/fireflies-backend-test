@@ -125,7 +125,7 @@ export const meetingRepository = {
 								meetingCount: { $sum: 1 },
 							},
 						},
-						{ $project: { participant: "$_id", meetingCount: 1 } },
+						{ $project: { participant: "$_id", meetingCount: 1, _id: 0 } },
 						{ $sort: { meetingCount: -1, participant: 1 } }, // Order by meeting count and then alphabetically by participant name
 						{ $limit: 5 },
 					],
@@ -138,10 +138,12 @@ export const meetingRepository = {
 						},
 						{
 							$project: {
-								dayOfWeek: "$_id",
+								dayOfWeek: "$_id", // 1 - Sunday ... 7 - Saturday
 								count: 1,
+								_id: 0,
 							},
 						},
+						{ $sort: { dayOfWeek: 1 } },
 					],
 					distinctParticipants: [
 						{ $unwind: "$participants" },

@@ -8,7 +8,7 @@ import express from "express";
 import cors, { CorsOptions } from "cors";
 import httpErrors from "http-errors";
 
-import { meetingRoutes } from "./meeting/meetings.routes.js";
+import { meetingRoutes } from "./meeting/meeting.routes.js";
 import { taskRoutes } from "./task/task.routes.js";
 import { dashboardRoutes } from "./dashboard/dashboard.routes.js";
 import { authMiddleware } from "./user/auth.middleware.js";
