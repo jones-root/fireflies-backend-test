@@ -42,7 +42,7 @@ export const meetingService = {
 				longestMeeting: general.longestMeeting ?? 0,
 				averageDuration: general.averageDuration ?? 0,
 				averageTranscriptLength: general.averageTranscriptLength ?? 0,
-				averageActionItems: general.averageActionItems ?? 0, // Equivalent to number os tasks
+				averageActionItems: general.averageActionItems ?? 0, // Equivalent to number of tasks
 			},
 			topParticipants: topParticipants,
 			meetingsByDayOfWeek,

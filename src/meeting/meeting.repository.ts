@@ -53,7 +53,7 @@ export const meetingRepository = {
 				$facet: {
 					totalMeetings: [{ $count: "count" }],
 					upcomingMeetings: [
-						// Return only meetings schedule to after now and meetings that didn't happened (where `transcript` is not set)
+						// Return only meetings that are scheduled to after now and meetings that didn't happened (where `transcript` is not set)
 						{ $match: { date: { $gte: now }, transcript: { $in: [null, undefined] } } },
 						{ $sort: { date: 1 } },
 						{ $limit: 5 },
